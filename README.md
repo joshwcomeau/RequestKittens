@@ -40,6 +40,7 @@ INDEX - Get /cats
     }, ...
   ]
 
+
 SHOW - get /cats/:id
   returns details on a single cat photo.
 
@@ -48,8 +49,28 @@ SHOW - get /cats/:id
   *RESPONSE:*
   Returns a single cat object, identical to Index:
 
-    {
-      id:       <integer>,
-      emotion:  <string>,
-      url:      <string>
-    }
+  {
+    id:       <integer>,
+    emotion:  <string>,
+    url:      <string>
+  }
+
+
+CREATE - post /cats
+  creates a new cat with the supplied data. Not sure yet but Im thinking it'll take multipart image form data.
+
+  *RESPONSE:*
+  Will return the newly created cat object with its ID
+
+
+UPDATE - patch/put /cats/:id
+  edits a pre-existing cat.
+
+  *RESPONSE:*
+  Will return the cat object.
+
+DELETE - delete /cats/:id
+  Exactly what you'd think.
+
+  *RESPONSE:*
+  Returns a confirmation.

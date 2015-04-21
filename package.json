@@ -2,7 +2,7 @@
   "name": "RequestKittens",
   "version": "0.0.1",
   "description": "The only API ridiculous enough to let you find cats by emotion.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/joshwcomeau/emoticat/issues"
   },
-  "homepage": "https://github.com/joshwcomeau/emoticat"
+  "homepage": "https://github.com/joshwcomeau/emoticat",
+  "dependencies": {
+    "percolator": "^1.5.0"
+  }
 }
