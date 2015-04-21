@@ -1,0 +1,19 @@
+{
+  "name": "RequestKittens",
+  "version": "0.0.1",
+  "description": "The only API ridiculous enough to let you find cats by emotion.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshwcomeau/emoticat.git"
+  },
+  "author": "Joshua Comeau",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joshwcomeau/emoticat/issues"
+  },
+  "homepage": "https://github.com/joshwcomeau/emoticat"
+}
