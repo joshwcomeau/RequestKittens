@@ -1,12 +1,14 @@
 // DEFAULT API SERVER
+var routes      = require('./app/routes.js');
+var app         = {};
 
-var Percolator = require('percolator').Percolator;
-var server = new Percolator();
+var Percolator  = require('percolator').Percolator;
+var server      = new Percolator(app);
+
+
 
 server.route('/cats', {
-  GET: function(req, res) {
-    res.object({ message: "Hello world!" }).send();
-  }
+  GET: routes.index
 });
 
 
