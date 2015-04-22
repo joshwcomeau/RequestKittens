@@ -10,6 +10,13 @@ exports.index = function(req, res) {
 
 // SHOW - GET /cats/:id
 exports.show = function(req, res) {
+  var catId = req.uri.child();
+  console.log("ID is ", catId);
+
+  var cat = Cat.findById(catId, function(err, doc) {
+    res.object(doc).send();
+  });
+
 }
 
 exports.create = function(req, res) {
@@ -27,7 +34,7 @@ exports.create = function(req, res) {
     }
   };
 
-  req.onJson(function(err, obj) {
+  req.onJson(schema, function(err, obj) {
     console.log("error:", err);
     console.log("object:", obj);
 

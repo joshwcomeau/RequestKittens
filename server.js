@@ -28,6 +28,10 @@ server.route('/cats', {
   POST: routes.create
 });
 
+server.route('/cats/:id', {
+  GET:  routes.show
+})
+
 
 
 // Some logging
