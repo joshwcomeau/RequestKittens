@@ -4,6 +4,34 @@ function getCatId(req) {
   return req.uri.child();
 }
 
+var schemaCreate = {
+  properties: {
+    "emotion": {
+      type: "string",
+      required: true
+    },
+    "url": {
+      type: "string",
+      required: true
+    }
+  }
+};
+
+var schemaUpdate = {
+  properties: {
+    "emotion": {
+      type: "string",
+      required: false
+    },
+    "url": {
+      type: "string",
+      required: false
+    }
+  }
+}
+
+
+
 // INDEX - GET /cats
 exports.index = function(req, res) {
   var opts   = req.uri.query();
@@ -29,20 +57,7 @@ exports.index = function(req, res) {
 // CREATE - POST /cats
 exports.create = function(req, res) {
 
-  var schema = {
-    properties: {
-      "emotion": {
-        type: "string",
-        required: true
-      },
-      "url": {
-        type: "string",
-        required: true
-      }
-    }
-  };
-
-  req.onJson(schema, function(err, obj) {
+  req.onJson(schemaCreate, function(err, obj) {
     // Error handling on schema failure is handled automatically by Percolator.
     // Assuming the only possible error here is invalid JSON.
     if (err) {
@@ -79,7 +94,7 @@ exports.show = function(req, res) {
 exports.update = function(req, res) {
   var catId = getCatId(req);
 
-  req.onJson(schema, function(err, obj) {
+  req.onJson(schemaUpdate, function(err, obj) {
     if (err) {
       console.log("ERROR:", err);
     } else {
@@ -100,19 +115,14 @@ exports.update = function(req, res) {
 exports.destroy = function(req, res) {
   var catId = getCatId(req);
 
-  req.onJson(schema, function(err, obj) {
-    if (err) {
-      console.log("ERROR:", err);
+  var cat = Cat.findByIdAndRemove(catId, function(err, doc) {
+    // Return our freshly-modified cat.
+    if (mongoErr) {
+      return res.status.internalServerError(["We could not kill the Cat:", mongoErr]);
     } else {
-      var cat = Cat.findByIdAndRemove(catId, obj, function(err, doc) {
-        // Return our freshly-modified cat.
-        if (mongoErr) {
-          return res.status.internalServerError(["We could not kill the Cat:", mongoErr]);
-        } else {
-          res.object({ deleted: true }).send();
-        }      
-      });
-    }
+      res.object({ deleted: true }).send();
+    }      
   });
+
 
 }
