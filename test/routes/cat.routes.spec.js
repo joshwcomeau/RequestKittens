@@ -6,21 +6,26 @@ var chai        = require("chai");
 
 // Local modules
 var routes      = require("../../app/routes.js");
+var Cat         = require("../../app/models/Cat.js");
+
 
 
 var expect      = chai.expect;
 var dbUrl       = "mongodb://localhost/RequestKittensTest";
 var port        = 9000;
-var url         = "http://localhost:"+port;
+
 var app         = { port: port }; 
 var server;
 
-
+var baseUrl     = "http://localhost:"+port;
+var catIndexUrl = baseUrl + "/cats";
 
 ////// Tests Begin //////
 
 describe("Routes", function() {
   beforeEach(function(done) {
+    if ( !mongoose.connection.db ) mongoose.connect(dbUrl);
+
     // set up our server
     server = new Percolator(app);
 
@@ -35,11 +40,62 @@ describe("Routes", function() {
     server.close(done);
   });
 
+  // Quick spec before we populate DB
   it("responds with a 404 when index has no cats", function(done) {
-    var routeUrl = url + "/cats";
-    hottap(routeUrl).request("GET", function(err, res) {
+    
+    hottap(baseUrl).request("GET", function(err, res) {
       expect(res.status).to.equal(404);
       done();
+    });
+  });
+
+  describe("when there are cats in the database", function() {
+    var snowball, cookie, tiger;
+
+    before(function(done) {
+      // Create some cats
+      cats = [
+        {
+          emotion: 'sad',
+          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/408/287.jpg'
+        },{
+          emotion: 'surprised',
+          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/286.jpg'
+        },{
+          emotion: 'surprised',
+          url:     'http://dreamatico.com/data_images/kitten/kitten-2.jpg'
+        },{
+          emotion: 'happy',
+          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/287.jpg'
+        },{
+          emotion: 'confused',
+          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/140.jpg'
+        },{
+          emotion: 'confused',
+          url:     'http://cdn.attackofthecute.com/January-20-2014-20-46-56-k.jpg'
+        }
+      ];
+
+      Cat.create(cats, function(err, docs) {
+        console.log("ERR", err);
+        // Assign some cat variables for future tests.
+        snowball = docs[0];
+        cookie   = docs[1];
+        tiger    = docs[2];
+
+        done();
+      });
+    });
+
+    after(function(done) {
+      Cat.remove({}, done);
+    });
+
+    it("returns a random array of kittens", function(done) {
+      hottap(catIndexUrl).request("GET", function(err, res) {
+        expect(res.status).to.equal(200);
+        done();
+      })
     });
   });
 
@@ -47,47 +103,3 @@ describe("Routes", function() {
 
 });
 
-// describe("Cat", function() {
-//   var currentCat = null;
-
-//   beforeEach(function(done) {
-//     var cat = new Cat({
-//       emotion: 'sad',
-//       url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/408/287.jpg'
-//     });
-
-//     mongoose.connect(dbUrl);
-//     mongoose.connection.on('open', function() {
-//       cat.save(function(err, doc) {
-//         if (err) return console.error(err);
-//         currentCat = doc;
-//         done();
-//       });
-//     });
-//   });
-
-//   afterEach(function(done) {
-//     Cat.remove({}, function() {
-//       done();
-//     });
-//   });
-
-//   it("has persisted a cat entry", function(done) {
-//     Cat.count({}, function(err, count) {
-//       if (err) return console.error(err);
-//       expect(count).to.equal(1);
-//       done();
-//     });
-//   });
-
-//   it("can be found by emotion", function(done) {
-//     Cat.findOne({emotion: 'sad'}, function(err, cat) {
-//       if (err) return console.error(err);
-
-//       expect(cat.name).to.equal(currentCat.name);
-//       done();
-//     });
-//   });
-
-
-// });

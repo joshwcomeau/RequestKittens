@@ -14,17 +14,9 @@ var dbUrl    = "mongodb://localhost/RequestKittensTest";
 describe("Cat", function() {
   var currentCat = null;
 
-  before(function(done) {
-    mongoose.connect(dbUrl);
-    mongoose.connection.on('open', function() {
-      // Clear the database
-      Cat.remove({}, function() {
-        done();
-      });
-    });
-  });
-
   beforeEach(function(done) {
+    if ( !mongoose.connection.db ) mongoose.connect(dbUrl);
+
     var cat = new Cat({
       emotion: 'sad',
       url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/408/287.jpg'
