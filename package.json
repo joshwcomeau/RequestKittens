@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/joshwcomeau/emoticat",
   "dependencies": {
+    "mongoose": "^4.0.1",
     "percolator": "^1.5.0"
   }
 }
