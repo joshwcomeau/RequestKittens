@@ -1,5 +1,6 @@
 // Vendor modules
 var Percolator  = require('percolator').Percolator;
+var hottap      = require('hottap').hottap;
 var mongoose    = require("mongoose");
 var chai        = require("chai");
 
@@ -9,14 +10,40 @@ var routes      = require("../../app/routes.js");
 
 var expect      = chai.expect;
 var dbUrl       = "mongodb://localhost/RequestKittensTest";
-var app         = {}; 
-var server      = new Percolator(app);
+var port        = 9000;
+var url         = "http://localhost:"+port;
+var app         = { port: port }; 
+var server;
 
 
 
-// ////// Tests Begin //////
+////// Tests Begin //////
 
 describe("Routes", function() {
+  beforeEach(function(done) {
+    // set up our server
+    server = new Percolator(app);
+
+    // set up our default routes
+    server.route('/cats',     routes.cats);
+    server.route('/cats/:id', routes.catsWithId);
+
+    server.listen(done);
+  });
+
+  afterEach(function(done) {
+    server.close(done);
+  });
+
+  it("responds with a 404 when index has no cats", function(done) {
+    var routeUrl = url + "/cats";
+    hottap(routeUrl).request("GET", function(err, res) {
+      expect(res.status).to.equal(404);
+      done();
+    });
+  });
+
+
 
 });
 

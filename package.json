@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "chai": "^2.2.0",
+    "hottap": "^1.0.1",
     "mocha": "^2.2.4"
   }
 }

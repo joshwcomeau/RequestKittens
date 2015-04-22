@@ -16,7 +16,12 @@ describe("Cat", function() {
 
   before(function(done) {
     mongoose.connect(dbUrl);
-    mongoose.connection.on('open', done);
+    mongoose.connection.on('open', function() {
+      // Clear the database
+      Cat.remove({}, function() {
+        done();
+      });
+    });
   });
 
   beforeEach(function(done) {
