@@ -15,12 +15,10 @@ Pretty straightforward: Standard RESTful interface for a 'cat' model.
   
   For image_size: 
 
-  ```
-    - thumb:  200x200px square image, cropped in the center,
-    - medium: 500px wide, with the original image's aspect ratio preserved (varying heights),
-    - large:  1000px wide, same aspect ratio,
-    - full:   Whatever the original image's size is
-  ```
+* thumb:  200x200px square image, cropped in the center
+* medium: 500px wide, with the original image's aspect ratio preserved (varying heights)
+* large:  1000px wide, same aspect ratio
+* full:   Whatever the original image's size is
 
   **REQUEST:**
 

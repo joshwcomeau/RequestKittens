@@ -24,8 +24,11 @@ db.on('error', console.error.bind(console, 'connection error:'));
 
 // ROUTES
 server.route('/cats', {
-  GET: routes.index
+  GET:  routes.index,
+  POST: routes.create
 });
+
+
 
 // Some logging
 server.before(function(req, res, handler, cb) {
