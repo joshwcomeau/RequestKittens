@@ -24,12 +24,14 @@ db.on('error', console.error.bind(console, 'connection error:'));
 
 // ROUTES
 server.route('/cats', {
-  GET:  routes.index,
-  POST: routes.create
+  GET:    routes.index,
+  POST:   routes.create
 });
 
 server.route('/cats/:id', {
-  GET:  routes.show
+  GET:    routes.show,
+  PUT:    routes.update,
+  DELETE: routes.destroy
 })
 
 
