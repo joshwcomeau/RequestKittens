@@ -8,12 +8,16 @@ var Cat      = require("../../app/models/Cat.js");
 var expect   = chai.expect;
 var dbUrl    = "mongodb://localhost/RequestKittensTest";
 
-mongoose.connect(dbUrl);
 
 ////// Tests Begin //////
 
 describe("Cat", function() {
   var currentCat = null;
+
+  before(function(done) {
+    mongoose.connect(dbUrl);
+    mongoose.connection.on('open', done);
+  });
 
   beforeEach(function(done) {
     var cat = new Cat({
@@ -26,6 +30,7 @@ describe("Cat", function() {
       currentCat = doc;
       done();
     });
+
   });
 
   afterEach(function(done) {
