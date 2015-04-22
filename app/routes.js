@@ -123,6 +123,18 @@ exports.destroy = function(req, res) {
       res.object({ deleted: true }).send();
     }      
   });
+}
 
 
+//// SHORTHAND ROUTE OBJECTS FOR PERCOLATOR
+
+exports.cats = {
+  GET:    exports.index,
+  POST:   exports.create
+}
+
+exports.catsWithId = {
+  GET:    exports.show,
+  PUT:    exports.update,
+  DELETE: exports.destroy
 }
