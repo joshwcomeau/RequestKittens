@@ -63,16 +63,8 @@ describe("Cat Routes", function() {
   });
 
   it("returns 401 unauthorized without an API key", function(done) {
-    hottap(baseUrl).json("GET", function(err, res) {
+    hottap(catIndexUrl).json("GET", function(err, res) {
       expect(res.status).to.equal(401);
-      done();
-    });
-  });
-
-
-  it("responds with a 404 when index has no cats", function(done) {   
-    hottap(baseUrl).json("GET", { "Authorization": ApiKey }, function(err, res) {
-      expect(res.status).to.equal(404);
       done();
     });
   });
@@ -118,18 +110,19 @@ describe("Cat Routes", function() {
       Cat.remove({}, done);
     });
 
+
     it("returns 200 OK", function(done) {
-      hottap(catIndexUrl).request("GET", function(err, res) {
+      hottap(catIndexUrl).json("GET", { "Authorization": ApiKey }, function(err, res) {
         expect(res.status).to.equal(200);
         done();
       })
     });
 
     it("returns an array of Cats", function(done) {
-      hottap(catIndexUrl).request("GET", function(err, res) {
-        var parsedResponse = JSON.parse(res.body);
-        expect(parsedResponse).to.have.all.keys("_items", "_links");
-        expect(parsedResponse._items).to.be.an('array');
+      hottap(catIndexUrl).json("GET", { "Authorization": ApiKey }, function(err, res) {
+  
+        expect(res.body).to.have.all.keys("_items", "_links");
+        expect(res.body._items).to.be.an('array');
         done();
       });
     });
@@ -137,10 +130,8 @@ describe("Cat Routes", function() {
     it("returns the number of cats specified", function(done) {
       var url = catIndexUrl + "?num_of_results=2";
 
-      hottap(url).request("GET", function(err, res) {
-        var parsedResponse = JSON.parse(res.body);
-
-        expect(parsedResponse._items).to.have.length(2);
+      hottap(url).json("GET", { "Authorization": ApiKey }, function(err, res) {
+        expect(res.body._items).to.have.length(2);
         done();
       });
     });
@@ -148,11 +139,9 @@ describe("Cat Routes", function() {
     it("returns the emotion specified", function(done) {
       var url = catIndexUrl + "?emotion=confused";
 
-      hottap(url).request("GET", function(err, res) {
-        var parsedResponse = JSON.parse(res.body);
-
-        expect(parsedResponse._items[0].emotion).to.equal("confused");
-        expect(parsedResponse._items[1].emotion).to.equal("confused");
+      hottap(url).json("GET", { "Authorization": ApiKey }, function(err, res) {
+        expect(res.body._items[0].emotion).to.equal("confused");
+        expect(res.body._items[1].emotion).to.equal("confused");
         done();
       });
     });
