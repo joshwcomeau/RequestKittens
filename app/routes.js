@@ -39,7 +39,7 @@ exports.index = function(req, res) {
 
   if ( opts.emotion ) filter.emotion = opts.emotion;
 
-  var cat    = Cat.findOneRandom(filter, function(err, doc) {
+  var cat    = Cat.findRandom(filter, {}, {limit: opts.num_of_results || 10}, function(err, doc) {
     if (err) {
       return res.status.internalServerError(["Oh no, the server exploded:", err]);
     } else {
@@ -48,7 +48,7 @@ exports.index = function(req, res) {
       if (!doc) {
         return res.status.notFound(["We don't have any cats that match your query:"]);
       }
-      res.object(doc).send();
+      res.collection(doc).send();
     }
   });
 }

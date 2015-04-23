@@ -91,12 +91,23 @@ describe("Routes", function() {
       Cat.remove({}, done);
     });
 
-    it("returns a random array of kittens", function(done) {
+    it("returns 200 OK", function(done) {
       hottap(catIndexUrl).request("GET", function(err, res) {
         expect(res.status).to.equal(200);
         done();
       })
     });
+
+    it("returns an array of Cats", function(done) {
+      hottap(catIndexUrl).request("GET", function(err, res) {
+        var parsedResponse = JSON.parse(res.body);
+        console.log(parsedResponse._items);
+        expect(parsedResponse._items).to.be.an('array');
+        done();
+      })
+    });
+
+
   });
 
 
