@@ -8,8 +8,13 @@ var mongoose    = require('mongoose');
 var routes      = require('./app/routes.js');
 var dbSettings  = require('./app/db_settings.js');
 
+var port        = 3000;
 
-var app         = {}; // 'global' variables and Percolator settings go here
+// 'global' variables and Percolator settings go here
+var app         = {
+  port: port
+}; 
+
 var server      = new Percolator(app);
 
 
