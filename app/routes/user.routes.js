@@ -30,7 +30,7 @@ exports.create = function(req, res) {
         if (mongoErr) {
           return res.status.internalServerError(["We could not generate an API key:", mongoErr]);
         } else {
-          res.object(user).send();
+          res.object({email: user.email, api_key: user.api_key}).send();
         }
       });
     }

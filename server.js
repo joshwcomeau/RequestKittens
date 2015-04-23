@@ -13,7 +13,8 @@ var port        = 3000;
 
 // 'global' variables and Percolator settings go here
 var app         = {
-  port: port
+  port:     port,
+  autoLink: false
 }; 
 
 var server      = new Percolator(app);
