@@ -40,14 +40,37 @@ describe("User Routes", function() {
   });
 
   describe("POSTing a new user", function() {
-    it("creates a new user and returns data", function(done) {
-      var url = userIndexUrl + "?email=josh@ua.com";
+    beforeEach(function(done) {
+      User.remove({}, done);
+    });
 
-      hottap(url).json("POST", {}, {"email":"josh@ua.com"}, function(req, res) {
+    it("creates a new user and returns a generated API key", function(done) {
+      hottap(userIndexUrl).json("POST", {}, {"email":"josh@ua.com"}, function(req, res) {
 
         expect(res.status).to.equal(200);
         expect(res.body).to.have.all.keys("email", "api_key");
+        expect(res.body.api_key).to.be.a('string');
         done();
+      });
+    });
+
+    it("does not create a user with duplicate email", function(done) {
+      // Start by creating a user in the database
+      User.create({ email: 'josh@ua.com' }, function(err, doc) {
+        if (err) console.log(err);
+
+      }).then(function() {
+        hottap(userIndexUrl).json("POST", {}, {"email":"josh@ua.com"}, function(req, res) {
+
+          expect(res.status).to.equal(400);
+
+          User.where({ 'email': 'josh@ua.com'}).count(function(err, count) {
+            expect(count).to.equal(1);
+            done();
+          });
+
+          
+        });
       });
     });
   });

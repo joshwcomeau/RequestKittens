@@ -27,8 +27,13 @@ exports.create = function(req, res) {
 
       var user = new User(obj);
       user.save(function(mongoErr) {
-        if (mongoErr) {
-          return res.status.internalServerError(["We could not generate an API key:", mongoErr]);
+        if (mongoErr) {        
+          if ( mongoErr.code === 11000 || mongoErr.code === 11001 ) {
+            return res.status.badRequest(["Sorry, you've already generated an API key from this email address before.", mongoErr]);
+          } else {
+            return res.status.internalServerError(["We could not generate an API key:", mongoErr]);  
+          }
+          
         } else {
           res.object({email: user.email, api_key: user.api_key}).send();
         }
