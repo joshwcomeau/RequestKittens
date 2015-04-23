@@ -1,29 +1,34 @@
 // Vendor modules
-var Percolator  = require('percolator').Percolator;
-var hottap      = require('hottap').hottap;
-var mongoose    = require("mongoose");
-var chai        = require("chai");
+var Percolator    = require('percolator').Percolator;
+var hottap        = require('hottap').hottap;
+var mongoose      = require("mongoose");
+var chai          = require("chai");
 
 // Local modules
-var routes      = require("../../app/routes/cat.routes.js");
-var Cat         = require("../../app/models/Cat.js");
+var Cat           = require("../../app/models/Cat.js");
+var User          = require("../../app/models/User.js");
+var Api           = require("../convenience/api_key.js");
+var routes        = require("../../app/routes.js");
 
 
 
-var expect      = chai.expect;
-var dbUrl       = "mongodb://localhost/RequestKittensTest";
-var port        = 9000;
+var expect        = chai.expect;
+var dbUrl         = "mongodb://localhost/RequestKittensTest";
+var port          = 9000;
 
-var app         = { port: port }; 
+var app           = { port: port }; 
 var server;
 
-var baseUrl     = "http://localhost:"+port;
-var catIndexUrl = baseUrl + "/cats";
+var baseUrl       = "http://localhost:"+port;
+var catIndexUrl   = baseUrl + "/cats";
+var userIndexUrl  = baseUrl + "/users";
+
+var ApiKey;
 
 ////// Tests Begin //////
 
 describe("Cat Routes", function() {
-  beforeEach(function(done) {
+  before(function(done) {
     if ( !mongoose.connection.db ) mongoose.connect(dbUrl);
 
     // set up our server
@@ -32,18 +37,41 @@ describe("Cat Routes", function() {
     // set up our default routes
     server.route('/cats',     routes.cats);
     server.route('/cats/:id', routes.catsWithId);
+    server.route('/users',    routes.users);
 
-    server.listen(done);
+    // Wipe the test DB cats and users
+    Cat.remove({})
+    .then(function() {
+      return User.remove({});
+    })
+    // Add our test user, get a valid API key
+    .then(function() {
+      return hottap(userIndexUrl).json("POST", {}, {"email":"test@user.com"}, function(req, res) {
+        ApiKey = res.body.api_key;
+        return true;
+      });
+    })
+    // start the server. We're good to go.
+    .then(function() {
+      return server.listen(done);  
+    });
+
   });
 
-  afterEach(function(done) {
+  after(function(done) {
     server.close(done);
   });
 
-  // Quick spec before we populate DB
-  it("responds with a 404 when index has no cats", function(done) {
-    
-    hottap(baseUrl).request("GET", function(err, res) {
+  it("returns 401 unauthorized without an API key", function(done) {
+    hottap(baseUrl).json("GET", function(err, res) {
+      expect(res.status).to.equal(401);
+      done();
+    });
+  });
+
+
+  it("responds with a 404 when index has no cats", function(done) {   
+    hottap(baseUrl).json("GET", { "Authorization": ApiKey }, function(err, res) {
       expect(res.status).to.equal(404);
       done();
     });

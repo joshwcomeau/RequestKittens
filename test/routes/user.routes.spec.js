@@ -5,7 +5,7 @@ var mongoose      = require("mongoose");
 var chai          = require("chai");
 
 // Local modules
-var routes        = require("../../app/routes/user.routes.js");
+var routes        = require("../../app/routes.js");
 var User          = require("../../app/models/User.js");
 
 
@@ -23,7 +23,7 @@ var userIndexUrl  = baseUrl + "/users";
 ////// Tests Begin //////
 
 describe("User Routes", function() {
-  beforeEach(function(done) {
+  before(function(done) {
     if ( !mongoose.connection.db ) mongoose.connect(dbUrl);
 
     // set up our server
@@ -35,7 +35,7 @@ describe("User Routes", function() {
     server.listen(done);
   });
 
-  afterEach(function(done) {
+  after(function(done) {
     server.close(done);
   });
 

@@ -1,35 +1,13 @@
 var Cat = require('../models/Cat.js');
 
-function getCatId(req) {
-  return req.uri.child();
+
+
+
+
+
+function requiresValidApiKey() {
+  
 }
-
-var schemaCreate = {
-  properties: {
-    "emotion": {
-      type: "string",
-      required: true
-    },
-    "url": {
-      type: "string",
-      required: true
-    }
-  }
-};
-
-var schemaUpdate = {
-  properties: {
-    "emotion": {
-      type: "string",
-      required: false
-    },
-    "url": {
-      type: "string",
-      required: false
-    }
-  }
-}
-
 
 
 // INDEX - GET /cats
@@ -55,8 +33,20 @@ exports.index = function(req, res) {
 
 // CREATE - POST /cats
 exports.create = function(req, res) {
+  var schema = {
+    properties: {
+      "emotion": {
+        type: "string",
+        required: true
+      },
+      "url": {
+        type: "string",
+        required: true
+      }
+    }
+  };
 
-  req.onJson(schemaCreate, function(err, obj) {
+  req.onJson(schema, function(err, obj) {
     // Error handling on schema failure is handled automatically by Percolator.
     // Assuming the only possible error here is invalid JSON.
     if (err) {
@@ -78,7 +68,7 @@ exports.create = function(req, res) {
 
 // SHOW - GET /cats/:id
 exports.show = function(req, res) {
-  var catId = getCatId(req);
+  var catId = req.uri.child();
 
   // Look it up by its ID in Mongoose
   var cat = Cat.findById(catId, function(err, doc) {
@@ -91,9 +81,21 @@ exports.show = function(req, res) {
 
 // UPDATE - PUT /cats/:id
 exports.update = function(req, res) {
-  var catId = getCatId(req);
+  var catId = req.uri.child();
+  var schema = {
+    properties: {
+      "emotion": {
+        type: "string",
+        required: false
+      },
+      "url": {
+        type: "string",
+        required: false
+      }
+    }
+  };
 
-  req.onJson(schemaUpdate, function(err, obj) {
+  req.onJson(schema, function(err, obj) {
     if (err) {
       console.log("ERROR:", err);
     } else {
@@ -112,7 +114,7 @@ exports.update = function(req, res) {
 
 // DESTROY - DELETE /cats/:od
 exports.destroy = function(req, res) {
-  var catId = getCatId(req);
+  var catId = req.uri.child();
 
   var cat = Cat.findByIdAndRemove(catId, function(err, doc) {
     // Return our freshly-modified cat.
@@ -122,18 +124,4 @@ exports.destroy = function(req, res) {
       res.object({ deleted: true }).send();
     }      
   });
-}
-
-
-//// SHORTHAND ROUTE OBJECTS FOR PERCOLATOR
-
-exports.cats = {
-  GET:    exports.index,
-  POST:   exports.create
-}
-
-exports.catsWithId = {
-  GET:    exports.show,
-  PUT:    exports.update,
-  DELETE: exports.destroy
 }
