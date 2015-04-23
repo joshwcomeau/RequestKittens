@@ -22,20 +22,23 @@ For image_size:
 
 **REQUEST:**
 
-  FIELD             ACCEPTED VALUES       REQUIRED          DEFAULT
-  emotion           see '/emotion'        false             null
-  format            json / xml / src      false             'json'
-  num_of_results    1-100                 false             10
-  image_size        see above             false             'medium'       
+```
+FIELD             ACCEPTED VALUES       REQUIRED          DEFAULT
+emotion           see '/emotion'        false             null
+format            json / xml / src      false             'json'
+num_of_results    1-100                 false             10
+image_size        see above             false             'medium'       
 
 *example: /cats?emotion=grumpy&num_of_results=25&image_size=large*
+```
 
-api_key should be sent as a header.
+To authorize: api_key should be sent as a header.
 
 
 **RESPONSE:**
 returns an array of cats with the following details:
 
+```
 [
   {
     id:       6,
@@ -43,7 +46,7 @@ returns an array of cats with the following details:
     url:      'http://www.cat.com/cat.png'
   }, ...
 ]
-
+```
 
 ######SHOW - get /cats/:id
   returns details on a single cat photo.
