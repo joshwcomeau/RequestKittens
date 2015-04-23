@@ -23,13 +23,14 @@ For image_size:
 **REQUEST:**
 
   FIELD             ACCEPTED VALUES       REQUIRED          DEFAULT
-  api_key           string                false             null
   emotion           see '/emotion'        false             null
   format            json / xml / src      false             'json'
   num_of_results    1-100                 false             10
   image_size        see above             false             'medium'       
 
-*example: /cats?api_key=KEY&emotion=grumpy&num_of_results=25&image_size=large*
+*example: /cats?emotion=grumpy&num_of_results=25&image_size=large*
+
+api_key should be sent as a header.
 
 
 **RESPONSE:**

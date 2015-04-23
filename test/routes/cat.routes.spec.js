@@ -100,9 +100,10 @@ describe("Routes", function() {
     it("returns an array of Cats", function(done) {
       hottap(catIndexUrl).request("GET", function(err, res) {
         var parsedResponse = JSON.parse(res.body);
+        expect(parsedResponse).to.have.all.keys("_items", "_links");
         expect(parsedResponse._items).to.be.an('array');
         done();
-      })
+      });
     });
 
     it("returns the number of cats specified", function(done) {
@@ -113,7 +114,7 @@ describe("Routes", function() {
 
         expect(parsedResponse._items).to.have.length(2);
         done();
-      })
+      });
     });
 
     it("returns the emotion specified", function(done) {
@@ -125,7 +126,7 @@ describe("Routes", function() {
         expect(parsedResponse._items[0].emotion).to.equal("confused");
         expect(parsedResponse._items[1].emotion).to.equal("confused");
         done();
-      })
+      });
     });
 
 
