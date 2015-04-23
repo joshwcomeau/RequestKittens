@@ -44,7 +44,6 @@ exports.index = function(req, res) {
       return res.status.internalServerError(["Oh no, the server exploded:", err]);
     } else {
       // Handle the no-cats-found case
-      console.log(doc);
       if (!doc) {
         return res.status.notFound(["We don't have any cats that match your query:"]);
       }

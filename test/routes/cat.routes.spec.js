@@ -77,7 +77,6 @@ describe("Routes", function() {
       ];
 
       Cat.create(cats, function(err, docs) {
-        console.log("ERR", err);
         // Assign some cat variables for future tests.
         snowball = docs[0];
         cookie   = docs[1];
@@ -101,8 +100,30 @@ describe("Routes", function() {
     it("returns an array of Cats", function(done) {
       hottap(catIndexUrl).request("GET", function(err, res) {
         var parsedResponse = JSON.parse(res.body);
-        console.log(parsedResponse._items);
         expect(parsedResponse._items).to.be.an('array');
+        done();
+      })
+    });
+
+    it("returns the number of cats specified", function(done) {
+      var url = catIndexUrl + "?num_of_results=2";
+
+      hottap(url).request("GET", function(err, res) {
+        var parsedResponse = JSON.parse(res.body);
+
+        expect(parsedResponse._items).to.have.length(2);
+        done();
+      })
+    });
+
+    it("returns the emotion specified", function(done) {
+      var url = catIndexUrl + "?emotion=confused";
+
+      hottap(url).request("GET", function(err, res) {
+        var parsedResponse = JSON.parse(res.body);
+
+        expect(parsedResponse._items[0].emotion).to.equal("confused");
+        expect(parsedResponse._items[1].emotion).to.equal("confused");
         done();
       })
     });
