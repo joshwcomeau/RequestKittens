@@ -37,7 +37,7 @@ server.route('/users',    routes.users);
 // Some logging
 server.before(function(req, res, handler, cb) {
   console.log('Request:', req.method, "to", req.url);
-  console.log('API key:', req.headers["Authorization"])
+  console.log('API key:', req.headers.authorization)
   cb();
 });
 

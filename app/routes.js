@@ -1,4 +1,4 @@
-var User           = require('./models/User.js');
+var User           = require('./models/user.model.js');
 
 var catController  = require('./controllers/cat.controller.js');
 var userController = require('./controllers/user.controller.js');

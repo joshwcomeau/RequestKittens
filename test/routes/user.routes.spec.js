@@ -6,7 +6,7 @@ var chai          = require("chai");
 
 // Local modules
 var routes        = require("../../app/routes.js");
-var User          = require("../../app/models/User.js");
+var User          = require("../../app/models/user.model.js");
 
 
 

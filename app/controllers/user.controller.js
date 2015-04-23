@@ -1,4 +1,4 @@
-var User = require('../models/User.js');
+var User = require('../models/user.model.js');
 
 
 // CREATE - POST /users

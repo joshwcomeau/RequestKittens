@@ -1,5 +1,5 @@
-var Cat  = require('../models/Cat.js');
-var User = require('../models/User.js');
+var Cat  = require('../models/cat.model.js');
+var User = require('../models/user.model.js');
 
 
 
