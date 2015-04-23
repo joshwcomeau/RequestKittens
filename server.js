@@ -5,7 +5,8 @@ var Percolator  = require('percolator').Percolator;
 var mongoose    = require('mongoose');
 
 // local module dependencies
-var routes      = require('./app/routes.js');
+var catRoutes   = require('./app/routes/cat.routes.js');
+var userRoutes  = require('./app/routes/user.routes.js');
 var dbSettings  = require('./app/db_settings.js');
 
 var port        = 3000;
@@ -28,9 +29,9 @@ db.on('error', console.error.bind(console, 'connection error:'));
 
 
 // ROUTES
-server.route('/cats',     routes.cats);
-server.route('/cats/:id', routes.catsWithId);
-
+server.route('/cats',     catRoutes.cats);
+server.route('/cats/:id', catRoutes.catsWithId);
+server.route('/users',    userRoutes.users);
 
 
 // Some logging

@@ -1,28 +1,28 @@
 // Vendor modules
-var Percolator  = require('percolator').Percolator;
-var hottap      = require('hottap').hottap;
-var mongoose    = require("mongoose");
-var chai        = require("chai");
+var Percolator    = require('percolator').Percolator;
+var hottap        = require('hottap').hottap;
+var mongoose      = require("mongoose");
+var chai          = require("chai");
 
 // Local modules
-var routes      = require("../../app/routes.js");
-var Cat         = require("../../app/models/Cat.js");
+var routes        = require("../../app/routes.js");
+var Cat           = require("../../app/models/Cat.js");
 
 
 
-var expect      = chai.expect;
-var dbUrl       = "mongodb://localhost/RequestKittensTest";
-var port        = 9000;
+var expect        = chai.expect;
+var dbUrl         = "mongodb://localhost/RequestKittensTest";
+var port          = 9000;
 
-var app         = { port: port }; 
+var app           = { port: port }; 
 var server;
 
-var baseUrl     = "http://localhost:"+port;
-var catIndexUrl = baseUrl + "/cats";
+var baseUrl       = "http://localhost:"+port;
+var userIndexUrl  = baseUrl + "/users";
 
 ////// Tests Begin //////
 
-describe("Cat Routes", function() {
+describe("User Routes", function() {
   beforeEach(function(done) {
     if ( !mongoose.connection.db ) mongoose.connect(dbUrl);
 
@@ -30,7 +30,7 @@ describe("Cat Routes", function() {
     server = new Percolator(app);
 
     // set up our default routes
-    server.route('/cats',     routes.cats);
+    server.route('/user',     routes.cats);
     server.route('/cats/:id', routes.catsWithId);
 
     server.listen(done);
