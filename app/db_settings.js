@@ -6,5 +6,11 @@ var protocol = 'mongodb';
 var username = process.env.REQUESTKITTENS_MONGOLAB_USERNAME;
 var password = process.env.REQUESTKITTENS_MONGOLAB_PASSWORD;
 
+
+// Use localhost if we don't have the environment variables set for mongolab.
+var localtesting = !process.env.REQUESTKITTENS_MONGOLAB_USERNAME;
+
 // build all of them into a public URL
-exports.url  = protocol + "://" + username + ":" + password + "@" + hostname + ":" + port + "/" + dbName;
+exports.url  = localtesting 
+? protocol + "://" + username + ":" + password + "@" + hostname + ":" + port + "/" + dbName
+: protocol + "://localhost:27017/" + dbName;
