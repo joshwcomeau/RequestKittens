@@ -1,22 +1,41 @@
-var catController  = require('./controllers/cat.controller.js');
-var userController = require('./controllers/cat.controller.js');
+var User           = require('./models/User.js');
 
-//// SHORTHAND ROUTE OBJECTS FOR PERCOLATOR
+var catController  = require('./controllers/cat.controller.js');
+var userController = require('./controllers/user.controller.js');
+
+function authenticate(req, res, cb) {
+  var ApiKey = req.headers.authorization;
+  return User.findOne({api_key: ApiKey}, function(err, user) {
+    // If there was an error, it's a 500 error.
+    if (err) return cb("500 error");
+
+    // If the user wasn't found, the user isn't registered.
+    if (!user) return cb(true);
+
+    // Add in some logic here for banned users.
+
+    return cb(false, user);
+  });
+
+}
+
 
 // ROUTE: /cats
 exports.cats = {
-  GET:    catController.index,
-  POST:   catController.create
+  authenticate: authenticate,
+  GET:          catController.index,
+  POST:         catController.create
 }
 
 // ROUTE: /cats/:id
 exports.catsWithId = {
-  GET:    catController.show,
-  PUT:    catController.update,
-  DELETE: catController.destroy
+  authenticate: authenticate,  
+  GET:          catController.show,
+  PUT:          catController.update,
+  DELETE:       catController.destroy
 }
 
 // ROUTE: /users
 exports.users = {
-  POST:   userController.create
+  POST:         userController.create
 }

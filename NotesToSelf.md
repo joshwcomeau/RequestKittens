@@ -15,3 +15,6 @@ I can view a list of running servers with 'forever list', and stop the server wi
 'forever stop 0'.
 
 I can view the log paths with 'forever logs'. Ex. ~/.forever/amld.log
+
+
+Temporary API key: 67544bc49373a2970d670bf7160c27dd

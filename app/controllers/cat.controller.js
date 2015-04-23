@@ -1,13 +1,7 @@
-var Cat = require('../models/Cat.js');
+var Cat  = require('../models/Cat.js');
+var User = require('../models/User.js');
 
 
-
-
-
-
-function requiresValidApiKey() {
-  
-}
 
 
 // INDEX - GET /cats
