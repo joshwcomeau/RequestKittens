@@ -3,7 +3,7 @@ var mongoose = require("mongoose");
 var chai     = require("chai");
 
 // Local modules
-var Cat      = require("../../app/models/cat.model.js");
+var Cat      = require("../../api/models/cat.model.js");
 
 var expect   = chai.expect;
 var dbUrl    = "mongodb://localhost/RequestKittensTest";

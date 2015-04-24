@@ -5,8 +5,8 @@ var Percolator  = require('percolator').Percolator;
 var mongoose    = require('mongoose');
 
 // local module dependencies
-var routes   = require('./app/routes.js');
-var dbSettings  = require('./app/db_settings.js');
+var routes   = require('./api/routes.js');
+var dbSettings  = require('./api/db_settings.js');
 
 var port        = 3000;
 

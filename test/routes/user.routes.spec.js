@@ -5,8 +5,8 @@ var mongoose      = require("mongoose");
 var chai          = require("chai");
 
 // Local modules
-var routes        = require("../../app/routes.js");
-var User          = require("../../app/models/user.model.js");
+var routes        = require("../../api/routes.js");
+var User          = require("../../api/models/user.model.js");
 
 
 
