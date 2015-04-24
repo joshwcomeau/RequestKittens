@@ -5,7 +5,7 @@ var Percolator  = require('percolator').Percolator;
 var mongoose    = require('mongoose');
 
 // local module dependencies
-var routes   = require('./api/routes.js');
+var routes      = require('./api/routes.js');
 var dbSettings  = require('./api/db_settings.js');
 
 var port        = 3000;
@@ -32,6 +32,13 @@ db.on('error', console.error.bind(console, 'connection error:'));
 server.route('/cats',     routes.cats);
 server.route('/cats/:id', routes.catsWithId);
 server.route('/users',    routes.users);
+
+// Forward root to sales site.
+server.route('/', {
+  GET: function(req, res) {
+    res.status.redirect("http://www.google.com");
+  }
+})
 
 
 // Some logging
