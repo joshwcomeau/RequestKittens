@@ -1,3 +1,11 @@
 .DS_Store
 
+# Libraries
 node_modules
+public/assets/libs
+
+# Compiled files
+public/style.css
+public/style.css.map
+public/app.js
+public/app.js.map
