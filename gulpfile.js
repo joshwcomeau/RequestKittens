@@ -27,9 +27,9 @@ gulp.task('styles', function() {
       .on('error', errorLog)
       .pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1'))
       .pipe(minifycss())
-      .pipe(concat('style.min.css'))
+      .pipe(concat('style.css'))
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('public/assets/css/'))
+    .pipe(gulp.dest('public/'))
     .pipe(notify({ message: 'Styles task complete' }));
 });
 
@@ -39,11 +39,11 @@ gulp.task('scripts', function() {
     .pipe(jshint())
     .pipe(jshint.reporter('default'))
     .pipe(sourcemaps.init())
-      .pipe(concat('main.min.js'))
+      .pipe(concat('app.js'))
       .pipe(uglify())
     .pipe(sourcemaps.write('./'))
     .on('error', errorLog)
-    .pipe(gulp.dest('public/assets/js'))
+    .pipe(gulp.dest('public/'))
     .pipe(notify({ message: 'Scripts task complete' }));
 });
 
