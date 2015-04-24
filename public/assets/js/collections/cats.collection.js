@@ -1,0 +1,1 @@
+// cats.collection.js
