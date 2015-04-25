@@ -14,7 +14,7 @@ exports.index = function(req, res) {
 
   if ( opts.emotion ) filter.emotion = opts.emotion;
 
-  var cat    = Cat.findRandom(filter, {}, {limit: opts.num_of_results || 10}, function(err, doc) {
+  Cat.findRandom(filter, {}, {limit: opts.num_of_results || 10}, function(err, doc) {
     if (err) {
       return res.status.internalServerError(["Oh no, the server exploded:", err]);
     } else {
@@ -58,11 +58,13 @@ exports.create = function(req, res) {
           return res.status.badRequest(["We don't have a '"+obj.emotion+"' emotion"]);
 
         } else {
-          console.log("Emotion is", emo)
-          // Merge our original JSON object with a new one that substitutes the emotion string for its ID.
-          var catObj = _.extend(obj, { emotion: emo._id });
-          console.log("catObj is", catObj);
-          var cat = new Cat(catObj);
+          console.log("Emotion is", emo);
+
+          // Embed our emotion into the cat object
+          obj.emotion = [emo]
+
+          console.log("obj is", obj);
+          var cat = new Cat(obj);
 
           cat.save(function(mongoErr) {
             if (mongoErr) {

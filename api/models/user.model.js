@@ -1,11 +1,5 @@
-var mongoose  = require('mongoose');
-var hat       = require('hat');
+var mongoose    = require('mongoose');
 
-var userSchema = mongoose.Schema({
-  email:   { type: String, required: true, index: {unique: true} },
-  api_key: { type: String, default: hat() },
-  role:    { type: String, default: 'developer' }
-});
+var userSchema  = require('./user.schema.js')
 
-
-module.exports = mongoose.model('User', userSchema);
+module.exports  = mongoose.model('User', userSchema);
