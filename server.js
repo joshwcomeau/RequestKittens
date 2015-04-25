@@ -43,10 +43,38 @@ server.route('/', {
 
 // Some logging
 server.before(function(req, res, handler, cb) {
-  console.log('Request:', req.method, "to", req.url);
-  console.log('API key:', req.headers.authorization)
-  cb();
+  // Deal with OPTIONS
+  if (req.method.toUpperCase() === "OPTIONS") {
+    var origin = (req.headers.origin || "*");
+
+    res.writeHead("204", "No Content", {
+      "access-control-allow-origin": origin,
+      "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "access-control-allow-headers": "content-type, accept, authorization",
+      "access-control-max-age": 10, // Seconds.
+      "content-length": 0
+    });
+
+    console.log("Response");
+
+    return res.end();
+  } else {
+    console.log("HEADERS FIRST", res.headers);
+    // $.res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    console.log("HEADERS AFTER", res.headers);
+    console.log('Request:', req.method, "to", req.url);
+    console.log('Headers:', req.headers)
+    cb();
+  }
+
 });
+
+// Add CORS headers for cross-origin permission. AJAX ftw!
+// server.after(function(req, res, handler) {
+//   console.log("response");
+
+// });
 
 // Gogogo!
 server.listen(function(err) {
