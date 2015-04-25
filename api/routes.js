@@ -2,6 +2,7 @@ var User           = require('./models/user.model.js');
 
 var catController  = require('./controllers/cat.controller.js');
 var userController = require('./controllers/user.controller.js');
+var emoController  = require('./controllers/emotion.controller.js');
 
 function authenticate(req, res, cb) {
   var ApiKey = req.headers.authorization;
@@ -38,4 +39,10 @@ exports.catsWithId = {
 // ROUTE: /users
 exports.users = {
   POST:         userController.create
+}
+
+// ROUTE: /emotions
+exports.emotions = {
+  authenticate: authenticate,
+  GET:          emoController.index
 }

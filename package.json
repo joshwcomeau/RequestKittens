@@ -20,7 +20,8 @@
     "hat": "0.0.3",
     "mongoose": "^4.0.1",
     "mongoose-simple-random": "^0.3.0",
-    "percolator": "^1.5.0"
+    "percolator": "^1.5.0",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "chai": "^2.2.0",

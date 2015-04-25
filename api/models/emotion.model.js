@@ -1,11 +1,7 @@
 var mongoose  = require('mongoose');
-var random    = require('mongoose-simple-random');
 
-var catSchema = mongoose.Schema({
-  emotion: String,
-  url:     String
+var emotionSchema = mongoose.Schema({
+  _id: String
 });
 
-catSchema.plugin(random);
-
-module.exports = mongoose.model('Cat', catSchema);
+module.exports = mongoose.model('Emotion', emotionSchema);

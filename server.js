@@ -32,6 +32,7 @@ db.on('error', console.error.bind(console, 'connection error:'));
 server.route('/cats',     routes.cats);
 server.route('/cats/:id', routes.catsWithId);
 server.route('/users',    routes.users);
+server.route('/emotions', routes.emotions);
 
 // Forward root to sales site.
 server.route('/', {

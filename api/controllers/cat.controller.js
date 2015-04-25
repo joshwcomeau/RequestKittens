@@ -1,5 +1,8 @@
-var Cat  = require('../models/cat.model.js');
-var User = require('../models/user.model.js');
+var _ = require('underscore');
+
+var Cat     = require('../models/cat.model.js');
+var User    = require('../models/user.model.js');
+var Emotion = require('../models/emotion.model.js');
 
 
 
@@ -47,12 +50,27 @@ exports.create = function(req, res) {
       console.log("ERROR:", err);
     } else {
 
-      var cat = new Cat(obj);
-      cat.save(function(mongoErr) {
-        if (mongoErr) {
-          return res.status.internalServerError(["We could not save the Cat:", mongoErr]);
+      // Find the emotion in our DB, get its id
+      Emotion.findOne({'name': obj.emotion}, function(emoErr, emo) {
+        if (emoErr) {
+          return res.status.internalServerError(["Trouble with emotions", emoErr]);
+        } else if (!emo) {
+          return res.status.badRequest(["We don't have a '"+obj.emotion+"' emotion"]);
+
         } else {
-          res.object(cat).send();
+          console.log("Emotion is", emo)
+          // Merge our original JSON object with a new one that substitutes the emotion string for its ID.
+          var catObj = _.extend(obj, { emotion: emo._id });
+          console.log("catObj is", catObj);
+          var cat = new Cat(catObj);
+
+          cat.save(function(mongoErr) {
+            if (mongoErr) {
+              return res.status.internalServerError(["We could not save the Cat:", mongoErr]);
+            } else {
+              res.object(cat).send();
+            }
+          });
         }
       });
     }
