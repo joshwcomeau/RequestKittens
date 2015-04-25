@@ -12,5 +12,5 @@ var localtesting = !process.env.REQUESTKITTENS_MONGOLAB_USERNAME;
 
 // build all of them into a public URL
 exports.url  = localtesting 
-? protocol + "://" + username + ":" + password + "@" + hostname + ":" + port + "/" + dbName
-: protocol + "://localhost:27017/" + dbName;
+? protocol + "://localhost:27017/" + dbName
+: protocol + "://" + username + ":" + password + "@" + hostname + ":" + port + "/" + dbName;
