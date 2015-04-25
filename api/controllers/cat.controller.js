@@ -12,7 +12,11 @@ exports.index = function(req, res) {
   var opts   = req.uri.query();
   var filter = {};
 
-  if ( opts.emotion ) filter.emotion = opts.emotion;
+  if ( opts.emotion ) {
+    filter = {
+      "emotion.name": opts.emotion
+    };
+  }
 
   Cat.findRandom(filter, {}, {limit: opts.num_of_results || 10}, function(err, doc) {
     if (err) {

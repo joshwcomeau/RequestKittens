@@ -7,6 +7,7 @@ var chai          = require("chai");
 // Local modules
 var Cat           = require("../../api/models/cat.model.js");
 var User          = require("../../api/models/user.model.js");
+var Emotion       = require("../../api/models/emotion.model.js");
 var routes        = require("../../api/routes.js");
 
 
@@ -72,36 +73,42 @@ describe("Cat Routes", function() {
     var snowball, cookie, tiger;
 
     before(function(done) {
-      // Create some cats
-      cats = [
-        {
-          emotion: 'sad',
-          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/408/287.jpg'
-        },{
-          emotion: 'surprised',
-          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/286.jpg'
-        },{
-          emotion: 'surprised',
-          url:     'http://dreamatico.com/data_images/kitten/kitten-2.jpg'
-        },{
-          emotion: 'happy',
-          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/287.jpg'
-        },{
-          emotion: 'confused',
-          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/140.jpg'
-        },{
-          emotion: 'confused',
-          url:     'http://cdn.attackofthecute.com/January-20-2014-20-46-56-k.jpg'
-        }
-      ];
+      // Create some emotions
+      var emotionArray = [ {name: 'sad'}, {name: 'surprised'}, {name: 'happy'}, {name: 'confused'} ];
 
-      Cat.create(cats, function(err, docs) {
-        // Assign some cat variables for future tests.
-        snowball = docs[0];
-        cookie   = docs[1];
-        tiger    = docs[2];
+      Emotion.create(emotionArray, function(err, emotions) {
+        // Create some cats
+        cats = [
+          {
+            emotion: emotions[0],
+            url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/408/287.jpg'
+          },{
+            emotion: emotions[1],
+            url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/286.jpg'
+          },{
+            emotion: emotions[1],
+            url:     'http://dreamatico.com/data_images/kitten/kitten-2.jpg'
+          },{
+            emotion: emotions[2],
+            url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/287.jpg'
+          },{
+            emotion: emotions[3],
+            url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/140.jpg'
+          },{
+            emotion: emotions[3],
+            url:     'http://cdn.attackofthecute.com/January-20-2014-20-46-56-k.jpg'
+          }
+        ];
 
-        done();
+        Cat.create(cats, function(err, docs) {
+          // Assign some cat variables for future tests.
+          snowball = docs[0];
+          cookie   = docs[1];
+          tiger    = docs[2];
+
+          done();
+
+        });
       });
     });
 
@@ -139,8 +146,9 @@ describe("Cat Routes", function() {
       var url = catIndexUrl + "?emotion=confused";
 
       hottap(url).json("GET", { "Authorization": ApiKey }, function(err, res) {
-        expect(res.body._items[0].emotion).to.equal("confused");
-        expect(res.body._items[1].emotion).to.equal("confused");
+        console.log("Response body", res.body);
+        expect(res.body._items[0].emotion[0].name).to.equal("confused");
+        expect(res.body._items[1].emotion[0].name).to.equal("confused");
         done();
       });
     });

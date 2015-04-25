@@ -4,6 +4,7 @@ var chai     = require("chai");
 
 // Local modules
 var Cat      = require("../../api/models/cat.model.js");
+var Emotion  = require("../../api/models/emotion.model.js");
 
 var expect   = chai.expect;
 var dbUrl    = "mongodb://localhost/RequestKittensTest";
@@ -18,7 +19,7 @@ describe("Cat", function() {
     if ( !mongoose.connection.db ) mongoose.connect(dbUrl);
 
     var cat = new Cat({
-      emotion: 'sad',
+      emotion: new Emotion({ name: 'sad'}),
       url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/408/287.jpg'
     });
 
@@ -27,6 +28,7 @@ describe("Cat", function() {
       currentCat = doc;
       done();
     });
+
 
   });
 
@@ -45,12 +47,13 @@ describe("Cat", function() {
   });
 
   it("can be found by emotion", function(done) {
-    Cat.findOne({emotion: 'sad'}, function(err, cat) {
+    Cat.findOne({"emotion.name": 'sad'}, function(err, cat) {
       if (err) return console.error(err);
 
-      expect(cat.name).to.equal(currentCat.name);
+      expect(cat.url).to.equal(currentCat.url);
       done();
     });
+
   });
 
 
