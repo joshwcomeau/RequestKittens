@@ -75,43 +75,6 @@ exports.create = function(req, res) {
     Emotion.findOne({'name': obj.emotion}, function(emoErr, emo) {
       if (emoErr) return res.status.internalServerError(["Trouble with emotions", emoErr]);
       if (!emo)   return res.status.badRequest(["We don't have a '"+obj.emotion+"' emotion"]);
-
-      // Alright. At this point we know we have a valid request!
-      // Time to process and store the image, before we add the Cat to mongo.
-
-      // s3 bucket file structure will be /requestkittens/[userid]-[randomchars]/thumb.jpg (with thumb, small, medium and full sizes. Always jpg)
-      // var baseKey = req.authenticated._id + "-" + hat();
-
-      // console.log('url is', obj.url)
-
-      // // create a thumbnail, pass its contents to the callback
-      // im.resize({
-      //   srcPath: obj.url,
-      //   format:  'jpg',
-      //   width:   200,
-      //   height:  200
-      // }, function(err, stdout, stderr) {
-      //   if (err) throw err;
-        
-      //   // photo contents are now being held in stdout. Convert it to binary
-      //   binaryData = new Buffer(stdout, 'binary');
-      //   // fs.writeFileSync('test.jpg', stdout);
-
-      //   s3Params = {
-      //     Key:  baseKey+"/thumb.jpg",
-      //     Body: binaryData
-      //   };
-
-      //   s3.putObject(s3Params, function(err, data) {
-      //     if (err) throw err;
-
-      //     console.log("Successfully uploaded data");
-
-      //   });
-      // });
-
-
-
       
       var originalImageUrl = obj.url;
 
@@ -122,16 +85,19 @@ exports.create = function(req, res) {
       var cat = new Cat(obj);
 
       // Do all the imagemagick and S3 stuff. Process and upload the image
-      cat.addUrls(originalImageUrl, req.authenticated._id);
-
-
-      cat.save(function(mongoErr) {
-        if (mongoErr) {
-          return res.status.internalServerError(["We could not save the Cat:", mongoErr]);
-        } else {
-          res.object(cat).send();
-        }
+      cat.addUrls(originalImageUrl, req.authenticated._id)
+      .then(function(result) {
+        cat.save(function(mongoErr) {
+          if (mongoErr) {
+            return res.status.internalServerError(["We could not save the Cat:", mongoErr]);
+          } else {
+            res.object(cat).send();
+          }
+        });
+      }, function(urlErr) {
+        res.status.internalServerError(["Trouble processing images", urlErr]);
       });
+
 
     });
 

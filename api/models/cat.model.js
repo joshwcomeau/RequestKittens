@@ -36,7 +36,7 @@ catSchema.methods.uploadImage = function(input, output, size, customOpts) {
       // If our image's natural size exceeds this option's size, shrink to fit.
       // Otherwise, we're keeping it at whatever its natural size is.
       opts.width = features.width > opts.width ? opts.width : features.width;
-      
+
 
       im.resize(opts, function(resizeErr, stdout, stderr) {
         if (resizeErr) {
@@ -81,23 +81,28 @@ catSchema.methods.addUrls = function(inputUrl, userId) {
   // Figure out our output base URL
   var outputBaseUrl = userId + "-" + hat();
 
-  return this.uploadImage(inputUrl, outputBaseUrl, "thumb", thumbSettings)
-  .then(function() {
-    return this.uploadImage(inputUrl, outputBaseUrl, "small", smallSettings);
-  }.bind(this))
-  .then(function() {
-    return this.uploadImage(inputUrl, outputBaseUrl, "medium", mediumSettings);
-  }.bind(this))
-  .then(function() {
-    return this.uploadImage(inputUrl, outputBaseUrl, "full", fullSettings);
-  }.bind(this))
-  .then(function(results) {
-    // we're done! success
-    return true;
-  }, function(err) {
-    console.log("Oh no, we failed.", err);
-    return false;
-  });
+  return new Promise(function(resolve, reject) {
+    this.uploadImage(inputUrl, outputBaseUrl, "thumb", thumbSettings)
+    .then(function() {
+      return this.uploadImage(inputUrl, outputBaseUrl, "small", smallSettings);
+    }.bind(this))
+    .then(function() {
+      return this.uploadImage(inputUrl, outputBaseUrl, "medium", mediumSettings);
+    }.bind(this))
+    .then(function() {
+      return this.uploadImage(inputUrl, outputBaseUrl, "full", fullSettings);
+    }.bind(this))
+    .then(function(results) {
+      // we're done! success
+      resolve(results);
+      return true;
+    }, function(err) {
+      console.log("Oh no, we failed.", err);
+      reject(err);
+      return false;
+    });
+  }.bind(this));
+
 
 
 
