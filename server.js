@@ -55,17 +55,10 @@ server.before(function(req, res, handler, cb) {
       "access-control-max-age": 10, // Seconds.
       "content-length": 0
     });
-
-    console.log("Response");
-
     return res.end();
+
   } else {
-    console.log("HEADERS FIRST", res.headers);
-    // $.res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    console.log("HEADERS AFTER", res.headers);
-    console.log('Request:', req.method, "to", req.url);
-    console.log('Headers:', req.headers)
     cb();
   }
 

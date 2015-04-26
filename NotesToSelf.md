@@ -5,6 +5,16 @@ Server IP is 45.55.246.246, domain requestkittens.com registered through GoDaddy
 
 I've created a user on the droplet, reqkit, to handle the server.
 
+#### Amazon S3
+I'm using the 'aws-sdk' npm package for uploading to S3. The package requires that
+your credentials (access key / secret) be stored in '~/.aws/credentials' with the following
+structure:
+
+```
+  [default]
+  aws_access_key_id = your access key id
+  aws_secret_access_key = your secret key
+```
 
 #### Running the server
 

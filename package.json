@@ -17,6 +17,8 @@
   },
   "homepage": "http://www.requestkittens.com",
   "dependencies": {
+    "aws-sdk": "^2.1.25",
+    "es6-promise": "^2.1.1",
     "hat": "0.0.3",
     "mongoose": "^4.0.1",
     "mongoose-simple-random": "^0.3.0",
