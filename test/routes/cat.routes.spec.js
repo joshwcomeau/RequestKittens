@@ -99,6 +99,15 @@ describe("Cat Routes", function() {
 
   ///////////////////// CREATE ROUTE ////////////////////
   describe("Cat Create", function () {
+    var catData = { 
+      "emotion": "happy",
+      "url":     "testurl",
+      "creator": "person"
+    };
+
+    after(function(done) {
+      Cat.remove({}, done);
+    });
 
     // Quick baseline tests, ones that should not persist cats.
     it("Contains zero cats at first", function(done) {
@@ -108,18 +117,56 @@ describe("Cat Routes", function() {
       });
     });
 
+    it("doesn't let unauthenticated user create a cat", function(done) {
+      hottap(catPostUrl).json("POST", 
+        {},
+        catData,
+        function(err, res) {
+          expect(res.status).to.equal(401);
+          done();
+        }
+      );
+    });
+
     it("doesn't let average joe create a cat", function(done) {
-      console.log("REquesting with api key", ApiKey);
       hottap(catPostUrl).json("POST", 
         { "Authorization": ApiKey }, 
-        { 
-          "emotion": "happy",
-          "url":     "testurl",
-          "creator": "person"
-        },
+        catData,
         function(err, res) {
-          console.log("Average joe gets status", res.status);
           expect(res.status).to.equal(401);
+          done();
+        }
+      );
+    });
+
+    it("doesn't persist cats without a supplied emotion", function(done) {
+      hottap(catPostUrl).json("POST", 
+        { "Authorization": AdminApiKey }, 
+        { "url":"testurl", "creator":"person" },
+        function(err, res) {
+          expect(res.status).to.equal(400);
+          done();
+        }
+      );
+    });
+
+    it("doesn't persist cats with an invalid emotion", function(done) {
+      hottap(catPostUrl).json("POST", 
+        { "Authorization": AdminApiKey }, 
+        { "emotion":"stupid", "url":"testurl", "creator":"person" },
+        function(err, res) {
+          expect(res.status).to.equal(400);
+          done();
+        }
+      );
+    });
+
+    it("doesn't persist cats without a supplied url", function(done) {
+      hottap(catPostUrl).json("POST", 
+        { "Authorization": AdminApiKey }, 
+        { "emotion":"happy", "creator":"person" },
+        function(err, res) {
+          expect(res.status).to.equal(400);
           done();
         }
       );
@@ -127,20 +174,36 @@ describe("Cat Routes", function() {
 
     // More thorough tests, that persist cats
     describe("authorized creation", function() {
-      it("does let our admin user create a cat", function(done) {
+      var response;
+
+      before(function(done) {
         hottap(catPostUrl).json("POST", 
           { "Authorization": AdminApiKey }, 
-          { 
-            "emotion": "happy",
-            "url":     "testurl",
-            "creator": "person"
-          },
+          catData,
           function(err, res) {
-            console.log("Admin gets status", res.status);
-            expect(res.status).to.equal(200);
+            response = res;
             done();
           }
         );
+      });
+
+      it("returns 200 OK", function(done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it("attaches an appropriate emotion object to the cat", function(done) {
+        expect(response.body.emotion[0]).to.have.all.keys("name", "_id", "__v");
+        done();
+      });
+
+      it("has persisted the cat in MongoDB", function(done) {
+        Cat.where({ url: "testurl" }).findOne({}, function(err, doc) {
+          expect(doc.url).to.equal(response.body.url);
+          expect(doc.creator).to.equal(response.body.creator);
+          expect(doc.emotion.name).to.equal(response.body.emotion.name);
+          done();
+        });
       });
 
     });
