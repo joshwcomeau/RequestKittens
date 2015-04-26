@@ -3,6 +3,7 @@ var Percolator    = require('percolator').Percolator;
 var hottap        = require('hottap').hottap;
 var mongoose      = require("mongoose");
 var chai          = require("chai");
+var Promise       = require('es6-promise').Promise;
 
 // Local modules
 var Cat           = require("../../api/models/cat.model.js");
@@ -21,9 +22,12 @@ var server;
 
 var baseUrl       = "http://localhost:"+port;
 var catIndexUrl   = baseUrl + "/cats";
+var catPostUrl    = catIndexUrl;
 var userIndexUrl  = baseUrl + "/users";
 
-var ApiKey;
+var ApiKey, AdminApiKey;
+
+var emotionSad, emotionSurprised, emotionHappy, emotionConfused;
 
 ////// Tests Begin //////
 
@@ -44,13 +48,40 @@ describe("Cat Routes", function() {
     .then(function() {
       return User.remove({});
     })
-    // Add our test user, get a valid API key
+    // Add emotions to the DB
     .then(function() {
-      return hottap(userIndexUrl).json("POST", {}, {"email":"test@user.com"}, function(req, res) {
-        ApiKey = res.body.api_key;
-        return true;
+      var emotionArray = [ {name: 'sad'}, {name: 'surprised'}, {name: 'happy'}, {name: 'confused'} ];
+
+      return Emotion.create(emotionArray, function(err, emotions) {  
+        if (err) console.log("\n\nERROR CREATING EMOTIONS", err);
+
+        emotionSad        = emotions[0];
+        emotionSurprised  = emotions[1];
+        emotionHappy      = emotions[2];
+        emotionConfused   = emotions[3];
+
+        return emotions;
+      });    
+    })    
+
+    // Add our admin user who can create cats
+    .then(function() {
+      return User.create({ email: "admin@user.com", api_key: 'ADMINUSER', role: 'creator' }, function(err, user) {
+        if (err) console.log("\n\nERROR CREATING ADMIN USER", err);
+        AdminApiKey = user.api_key;
+        return user;
       });
     })
+
+    // Add our test user, get a valid API key
+    .then(function() {
+      return User.create({ email: "test@user.com" }, function(err, user) {
+        if (err) console.log("\n\nERROR CREATING TEST USER", err);
+        ApiKey = user.api_key;
+        return user;
+      });      
+    })
+  
     // start the server. We're good to go.
     .then(function() {
       return server.listen(done);  
@@ -62,58 +93,115 @@ describe("Cat Routes", function() {
     server.close(done);
   });
 
-  it("returns 401 unauthorized without an API key", function(done) {
-    hottap(catIndexUrl).json("GET", function(err, res) {
-      expect(res.status).to.equal(401);
-      done();
+
+
+
+
+  ///////////////////// CREATE ROUTE ////////////////////
+  describe("Cat Create", function () {
+
+    // Quick baseline tests, ones that should not persist cats.
+    it("Contains zero cats at first", function(done) {
+      Cat.find({}).count(function(err, count) {
+        expect(count).to.equal(0);
+        done();
+      });
     });
+
+    it("doesn't let average joe create a cat", function(done) {
+      console.log("REquesting with api key", ApiKey);
+      hottap(catPostUrl).json("POST", 
+        { "Authorization": ApiKey }, 
+        { 
+          "emotion": "happy",
+          "url":     "testurl",
+          "creator": "person"
+        },
+        function(err, res) {
+          console.log("Average joe gets status", res.status);
+          expect(res.status).to.equal(401);
+          done();
+        }
+      );
+    });
+
+    // More thorough tests, that persist cats
+    describe("authorized creation", function() {
+      it("does let our admin user create a cat", function(done) {
+        hottap(catPostUrl).json("POST", 
+          { "Authorization": AdminApiKey }, 
+          { 
+            "emotion": "happy",
+            "url":     "testurl",
+            "creator": "person"
+          },
+          function(err, res) {
+            console.log("Admin gets status", res.status);
+            expect(res.status).to.equal(200);
+            done();
+          }
+        );
+      });
+
+    });
+
   });
 
-  describe("when there are cats in the database", function() {
+
+
+
+
+  ///////////////// INDEX ROUTE //////////////////////////
+  describe("Cat Index", function() {
     var snowball, cookie, tiger;
 
     before(function(done) {
-      // Create some emotions
-      var emotionArray = [ {name: 'sad'}, {name: 'surprised'}, {name: 'happy'}, {name: 'confused'} ];
 
-      Emotion.create(emotionArray, function(err, emotions) {
-        // Create some cats
-        cats = [
-          {
-            emotion: emotions[0],
-            url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/408/287.jpg'
-          },{
-            emotion: emotions[1],
-            url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/286.jpg'
-          },{
-            emotion: emotions[1],
-            url:     'http://dreamatico.com/data_images/kitten/kitten-2.jpg'
-          },{
-            emotion: emotions[2],
-            url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/287.jpg'
-          },{
-            emotion: emotions[3],
-            url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/140.jpg'
-          },{
-            emotion: emotions[3],
-            url:     'http://cdn.attackofthecute.com/January-20-2014-20-46-56-k.jpg'
-          }
-        ];
+      // Create some cats
+      cats = [
+        {
+          emotion: emotionSad,
+          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/408/287.jpg'
+        },{
+          emotion: emotionSurprised,
+          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/286.jpg'
+        },{
+          emotion: emotionSurprised,
+          url:     'http://dreamatico.com/data_images/kitten/kitten-2.jpg'
+        },{
+          emotion: emotionHappy,
+          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/287.jpg'
+        },{
+          emotion: emotionConfused,
+          url:     'http://placekitten.com.s3.amazonaws.com/homepage-samples/200/140.jpg'
+        },{
+          emotion: emotionConfused,
+          url:     'http://cdn.attackofthecute.com/January-20-2014-20-46-56-k.jpg'
+        }
+      ];
 
-        Cat.create(cats, function(err, docs) {
-          // Assign some cat variables for future tests.
-          snowball = docs[0];
-          cookie   = docs[1];
-          tiger    = docs[2];
+      Cat.create(cats, function(err, docs) {
+        // Assign some cat variables for future tests.
+        snowball = docs[0];
+        cookie   = docs[1];
+        tiger    = docs[2];
 
-          done();
+        done();
 
-        });
       });
+
     });
 
     after(function(done) {
       Cat.remove({}, done);
+    });
+
+
+    it("returns 401 unauthorized without an API key", function(done) {
+      hottap(catIndexUrl).json("GET", function(err, res) {
+        expect(res.status).to.equal(401);
+        done();
+      });
     });
 
 
@@ -146,7 +234,6 @@ describe("Cat Routes", function() {
       var url = catIndexUrl + "?emotion=confused";
 
       hottap(url).json("GET", { "Authorization": ApiKey }, function(err, res) {
-        console.log("Response body", res.body);
         expect(res.body._items[0].emotion[0].name).to.equal("confused");
         expect(res.body._items[1].emotion[0].name).to.equal("confused");
         done();

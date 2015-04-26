@@ -47,39 +47,49 @@ exports.create = function(req, res) {
     }
   };
 
+  // Only users with roles 'admin' or 'creator' can create cats.
+  // Throw a 401 unauthorized if their user role is 'developer'.
+  console.log( "User has role", req.authenticated.role );
+
+  if ( req.authenticated.role !== 'admin' && req.authenticated.role !== 'creator' ) {
+    console.log("Regular joe trying to create a cat");
+    return res.status.unauthenticated(["Sorry, only administrators can add new cats to the database"]);
+  }
+
   req.onJson(schema, function(err, obj) {
     // Error handling on schema failure is handled automatically by Percolator.
     // Assuming the only possible error here is invalid JSON.
     if (err) {
       console.log("ERROR:", err);
-    } else {
+      return res.status.internalServerError(["Internal server error", emoErr]);
+    } 
 
-      // Find the emotion in our DB, get its id
-      Emotion.findOne({'name': obj.emotion}, function(emoErr, emo) {
-        if (emoErr) {
-          return res.status.internalServerError(["Trouble with emotions", emoErr]);
-        } else if (!emo) {
-          return res.status.badRequest(["We don't have a '"+obj.emotion+"' emotion"]);
+    // Find the emotion in our DB, get its id
+    Emotion.findOne({'name': obj.emotion}, function(emoErr, emo) {
+      if (emoErr) {
+        return res.status.internalServerError(["Trouble with emotions", emoErr]);
+      } else if (!emo) {
+        return res.status.badRequest(["We don't have a '"+obj.emotion+"' emotion"]);
+      }
 
+      console.log("Emotion is", emo);
+
+      // Embed our emotion into the cat object
+      obj.emotion = [emo]
+
+      console.log("obj is", obj);
+      var cat = new Cat(obj);
+
+      cat.save(function(mongoErr) {
+        if (mongoErr) {
+          return res.status.internalServerError(["We could not save the Cat:", mongoErr]);
         } else {
-          console.log("Emotion is", emo);
-
-          // Embed our emotion into the cat object
-          obj.emotion = [emo]
-
-          console.log("obj is", obj);
-          var cat = new Cat(obj);
-
-          cat.save(function(mongoErr) {
-            if (mongoErr) {
-              return res.status.internalServerError(["We could not save the Cat:", mongoErr]);
-            } else {
-              res.object(cat).send();
-            }
-          });
+          res.object(cat).send();
         }
       });
-    }
+
+    });
+
   });
 }
 
