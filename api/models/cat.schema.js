@@ -3,5 +3,6 @@ var EmotionSchema = require('./emotion.schema.js');
 
 module.exports    = mongoose.Schema({
   emotion: [EmotionSchema],
-  url:     String
+  url:     { type: Object, default: {} },
+  credit:  String
 });
