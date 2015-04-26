@@ -33,13 +33,10 @@ catSchema.methods.uploadImage = function(input, output, size, customOpts) {
         return false;
       }
 
-      if ( size === 'full' ) {
-        // We have a max allowable size of 3000x2000. If we're in 'full' mode,
-        // set the width/height to its natural size so long as it doesn't
-        // exceed this max.
-        opts.width  = features.width  > 3000 ? 3000 : features.width;
-        opts.height = features.height > 2000 ? 2000 : features.height;
-      }
+      // If our image's natural size exceeds this option's size, shrink to fit.
+      // Otherwise, we're keeping it at whatever its natural size is.
+      opts.width = features.width > opts.width ? opts.width : features.width;
+      
 
       im.resize(opts, function(resizeErr, stdout, stderr) {
         if (resizeErr) {
@@ -71,13 +68,15 @@ catSchema.methods.uploadImage = function(input, output, size, customOpts) {
   });      //     end Promise
 };        //      end catSchema.uploadImage()
 
+
+
 catSchema.methods.addUrls = function(inputUrl, userId) {
   // takes an input URL like http://site.com/img.jpg, and uploads
   // 4 different versions of the URL for use in the API (thumb, small, medium, full)
   var thumbSettings   = { width: 200, height: 200 };
-  var smallSettings   = { width: 480 };
-  var mediumSettings  = { width: 960 };
-  var fullSettings    = {};
+  var smallSettings   = { width: 480  };
+  var mediumSettings  = { width: 960  };
+  var fullSettings    = { width: 3000 };
 
   // Figure out our output base URL
   var outputBaseUrl = userId + "-" + hat();
