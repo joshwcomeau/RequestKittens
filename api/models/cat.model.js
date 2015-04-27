@@ -15,8 +15,7 @@ var catSchema = require('./cat.schema.js');
 catSchema.plugin(random);
 
 // Add the ability to process URLs as images
-catSchema.methods.uploadImage = function(input, output, size, customOpts) {
-  var s3Params, binaryData;
+catSchema.methods.processAndUploadImage = function(input, output, size, customOpts) {
   var defaultOpts = { srcPath: input, format: 'jpg' };
   var opts        = _.extend(defaultOpts, customOpts);
 
@@ -26,47 +25,58 @@ catSchema.methods.uploadImage = function(input, output, size, customOpts) {
   var catObj      = this;
 
   return new Promise(function(resolve, reject) {
-    im.identify(input, function(identifyErr, features) {
-      if (identifyErr) {
-        console.error(identifyErr);
-        reject(identifyErr);
-        return false;
-      }
+    this.identifyImage(input)
+    .then(function(features) {
+      return this.resize(opts, features);
+    }.bind(this))
+    .then(function(photoData) {
+      return this.uploadToS3(photoData, outputPath)
+    }.bind(this))
+    .then(function() {
+      // update local model, we're done!
+        catObj.url[size] = outputBase + outputPath;
+        resolve();
+    }, function(err) {
+      reject(err);
+    });
+  }.bind(this));      //     end Promise
+};                   //      end catSchema.processAndUploadImage()
 
-      // If our image's natural size exceeds this option's size, shrink to fit.
-      // Otherwise, we're keeping it at whatever its natural size is.
-      opts.width = features.width > opts.width ? opts.width : features.width;
 
+catSchema.methods.identifyImage = function(input) {
+  return new Promise(function(resolve, reject) {
+    im.identify(input, function(err, features) {
+      err ? reject(err) : resolve(features);
+    });
+  }); 
+};
 
-      im.resize(opts, function(resizeErr, stdout, stderr) {
-        if (resizeErr) {
-          console.error(resizeErr);
-          reject(resizeErr);
-          return false;
-        }
+catSchema.methods.resize = function(opts, features) {
+  return new Promise(function(resolve, reject) {
+    opts.width = features.width > opts.width ? opts.width : features.width;
 
-        binaryData = new Buffer(stdout, 'binary');
+    im.resize(opts, function(resizeErr, stdout, stderr) {
+      resizeErr ? reject(resizeErr) : resolve(stdout);
+    });
+  });
+};
 
-        s3Params = {
-          Key:  outputPath,
-          Body: binaryData
-        };
+catSchema.methods.uploadToS3 = function(photoData, outputPath) {
+  return new Promise(function(resolve, reject) {
+    var binaryData, s3Params;
+    
+    binaryData = new Buffer(photoData, 'binary');
 
-        s3.putObject(s3Params, function(s3err, data) {
-          if (s3err) {
-            console.error(s3err);
-            reject(s3err);
-            return false;
-          } else {
-            // Save this as part of the cat URL object
-            catObj.url[size] = outputBase + outputPath;
-            resolve(data);
-          }
-        });   //  end S3 putObject
-      });    //   end Resize
-    });     //    end Identify
-  });      //     end Promise
-};        //      end catSchema.uploadImage()
+    s3Params = {
+      Key:  outputPath,
+      Body: binaryData
+    };
+
+    s3.putObject(s3Params, function(s3err, data) {
+      s3err ? reject(s3err) : resolve(data);
+    }); 
+  });
+};
 
 
 
@@ -83,19 +93,21 @@ catSchema.methods.addUrls = function(inputUrl, userId) {
 
   return new Promise(function(resolve, reject) {
     if (inputUrl === "testurl") {
+      // 'testurl' is a special value that bypasses the storage in Amazon S3.
+      // This is so that our specs can test Cat creation without polluting our S3 bucket.
       resolve();
       return false;
     }
 
-    this.uploadImage(inputUrl, outputBaseUrl, "thumb", thumbSettings)
+    this.processAndUploadImage(inputUrl, outputBaseUrl, "thumb", thumbSettings)
     .then(function() {
-      return this.uploadImage(inputUrl, outputBaseUrl, "small", smallSettings);
+      return this.processAndUploadImage(inputUrl, outputBaseUrl, "small", smallSettings);
     }.bind(this))
     .then(function() {
-      return this.uploadImage(inputUrl, outputBaseUrl, "medium", mediumSettings);
+      return this.processAndUploadImage(inputUrl, outputBaseUrl, "medium", mediumSettings);
     }.bind(this))
     .then(function() {
-      return this.uploadImage(inputUrl, outputBaseUrl, "full", fullSettings);
+      return this.processAndUploadImage(inputUrl, outputBaseUrl, "full", fullSettings);
     }.bind(this))
     .then(function(results) {
       // we're done! success
