@@ -197,6 +197,24 @@ describe("Cat Routes", function() {
         done();
       });
 
+      describe("shuffled input for logical output", function() {
+        it("created a 'source' object with appropriate keys", function(done) {
+          expect(response.body.source).to.have.all.keys("owner", "url");
+          done();
+        });
+
+        it("populated the source URL with our input URL", function(done) {
+          expect(response.body.source.url).to.equal(catData.url);
+          done();
+        });
+
+        it("populated the source owner with our input owner", function(done) {
+          expect(response.body.source.owner).to.equal(catData.owner);
+          done();
+        });
+      });
+
+
       it("has persisted the cat in MongoDB", function(done) {
         Cat.findOne({}, function(err, doc) {
           expect(doc.source.owner).to.equal(response.body.source.owner);
