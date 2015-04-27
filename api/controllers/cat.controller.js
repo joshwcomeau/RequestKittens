@@ -52,7 +52,7 @@ exports.create = function(req, res) {
         type: "string",
         required: true
       },
-      "creator": {
+      "owner": {
         type: "string",
         required: false
       }
@@ -66,6 +66,8 @@ exports.create = function(req, res) {
   }
 
   req.onJson(schema, function(err, obj) {
+    var catObject;
+
     // Error handling on schema failure is handled automatically by Percolator.
     // Assuming the only possible error here is invalid JSON.
     if (err) return res.status.internalServerError(["Internal server error", emoErr]);
@@ -75,17 +77,21 @@ exports.create = function(req, res) {
     Emotion.findOne({'name': obj.emotion}, function(emoErr, emo) {
       if (emoErr) return res.status.internalServerError(["Trouble with emotions", emoErr]);
       if (!emo)   return res.status.badRequest(["We don't have a '"+obj.emotion+"' emotion"]);
-      
-      var originalImageUrl = obj.url;
 
-      // Embed our emotion into the cat object, and reset the URL as it's non-conforming atm.
-      obj.emotion = [emo];
-      obj.url     = {};
+      // build a cat object with the data we've accrued so far and our user-submitted object.
+      var catObject = {
+        url: {},
+        emotion: [emo],
+        source: {
+          url: obj.url,
+          owner: obj.owner
+        }
+      }
 
-      var cat = new Cat(obj);
+      var cat = new Cat(catObject);
 
       // Do all the imagemagick and S3 stuff. Process and upload the image
-      cat.addUrls(originalImageUrl, req.authenticated._id)
+      cat.addUrls(obj.url, req.authenticated._id)
       .then(function(result) {
         cat.save(function(mongoErr) {
           if (mongoErr) {

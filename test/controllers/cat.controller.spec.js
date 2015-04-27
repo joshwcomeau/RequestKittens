@@ -102,7 +102,7 @@ describe("Cat Routes", function() {
     var catData = { 
       "emotion": "happy",
       "url":     "testurl",
-      "creator": "person"
+      "owner":   "Jane Doe"
     };
 
     after(function(done) {
@@ -198,8 +198,8 @@ describe("Cat Routes", function() {
       });
 
       it("has persisted the cat in MongoDB", function(done) {
-        Cat.where({ url: "testurl" }).findOne({}, function(err, doc) {
-          expect(doc.creator).to.equal(response.body.creator);
+        Cat.findOne({}, function(err, doc) {
+          expect(doc.source.owner).to.equal(response.body.source.owner);
           expect(doc.emotion.name).to.equal(response.body.emotion.name);
           done();
         });
