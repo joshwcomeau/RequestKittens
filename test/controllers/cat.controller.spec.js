@@ -199,7 +199,6 @@ describe("Cat Routes", function() {
 
       it("has persisted the cat in MongoDB", function(done) {
         Cat.where({ url: "testurl" }).findOne({}, function(err, doc) {
-          expect(doc.url).to.equal(response.body.url);
           expect(doc.creator).to.equal(response.body.creator);
           expect(doc.emotion.name).to.equal(response.body.emotion.name);
           done();
