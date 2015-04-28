@@ -37,7 +37,7 @@ server.route('/emotions', routes.emotions);
 // Forward root to sales site.
 server.route('/', {
   GET: function(req, res) {
-    res.status.redirect("http://www.google.com");
+    res.status.redirect("http://joshwcomeau.github.io/RequestKittensDocs/public/index.html");
   }
 })
 
