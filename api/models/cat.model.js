@@ -84,8 +84,7 @@ catSchema.methods.addUrls = function(inputUrl, userId) {
   // takes an input URL like http://site.com/img.jpg, and uploads
   // 4 different versions of the URL for use in the API (thumb, small, medium, full)
   var thumbSettings   = { width: 200, height: 200 };
-  var smallSettings   = { width: 480  };
-  var mediumSettings  = { width: 960  };
+  var normalSettings  = { width: 500  };
   var fullSettings    = { width: 3000 };
 
   // Figure out our output base URL
@@ -101,10 +100,7 @@ catSchema.methods.addUrls = function(inputUrl, userId) {
 
     this.processAndUploadImage(inputUrl, outputBaseUrl, "thumb", thumbSettings)
     .then(function() {
-      return this.processAndUploadImage(inputUrl, outputBaseUrl, "small", smallSettings);
-    }.bind(this))
-    .then(function() {
-      return this.processAndUploadImage(inputUrl, outputBaseUrl, "medium", mediumSettings);
+      return this.processAndUploadImage(inputUrl, outputBaseUrl, "normal", normalSettings);
     }.bind(this))
     .then(function() {
       return this.processAndUploadImage(inputUrl, outputBaseUrl, "full", fullSettings);

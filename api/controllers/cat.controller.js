@@ -25,15 +25,26 @@ exports.index = function(req, res) {
     };
   }
 
-  Cat.findRandom(filter, {}, {limit: opts.num_of_results || 10}, function(err, doc) {
+  Cat.findRandom(filter, {}, {limit: opts.num_of_results || 10}, function(err, docs) {
     if (err) {
       return res.status.internalServerError(["Oh no, the server exploded:", err]);
     } else {
       // Handle the no-cats-found case
-      if (!doc) {
+      if (!docs) {
         return res.status.notFound(["We don't have any cats that match your query:"]);
       }
-      res.collection(doc).send();
+
+      // strip the database cat objects of fields the user doesn't need.
+      cats = docs.map(function(doc) {
+        return {
+          id: doc._id,
+          url: doc.url[opts.imageSize],
+          emotion: doc.emotion[0].name,
+          source: doc.source
+        };
+      }.bind(this));
+
+      res.collection(cats).send();
     }
   });
 }
@@ -54,7 +65,7 @@ exports.create = function(req, res) {
       },
       "owner": {
         type: "string",
-        required: false
+        required: true
       }
     }
   };
@@ -67,6 +78,8 @@ exports.create = function(req, res) {
 
   req.onJson(schema, function(err, obj) {
     var catObject;
+
+    console.log("Received object", obj);
 
     // Error handling on schema failure is handled automatically by Percolator.
     // Assuming the only possible error here is invalid JSON.
