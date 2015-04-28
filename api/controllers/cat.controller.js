@@ -38,7 +38,7 @@ exports.index = function(req, res) {
       cats = docs.map(function(doc) {
         return {
           id: doc._id,
-          url: doc.url[opts.imageSize],
+          url: doc.url[opts.imageSize || "normal"],
           emotion: doc.emotion[0].name,
           source: doc.source
         };
