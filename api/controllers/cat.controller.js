@@ -25,7 +25,8 @@ exports.index = function(req, res) {
     };
   }
 
-  Cat.findRandom(filter, {}, {limit: opts.num_of_results || 10}, function(err, docs) {
+
+  Cat.findRandom(filter, {}, {limit: opts.numOfResults || 10}, function(err, docs) {
     if (err) {
       return res.status.internalServerError(["Oh no, the server exploded:", err]);
     } else {

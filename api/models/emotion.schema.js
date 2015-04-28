@@ -1,5 +1,5 @@
 var mongoose  = require('mongoose');
 
-module.exports = mongoose.Schema({
+module.exports = new mongoose.Schema({
   name: String
 });

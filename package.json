@@ -22,8 +22,8 @@
     "hat": "0.0.3",
     "imagemagick": "^0.1.3",
     "mongoose": "^4.0.1",
-    "mongoose-simple-random": "^0.3.0",
-    "percolator": "^1.5.0",
+    "mongoose-random": "^0.1.1",
+\    "percolator": "^1.5.0",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
