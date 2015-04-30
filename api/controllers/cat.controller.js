@@ -37,9 +37,11 @@ exports.index = function(req, res) {
 
       // strip the database cat objects of fields the user doesn't need.
       cats = docs.map(function(doc) {
+        var urlField = ( opts.imageSize === "all" ) ? doc.url : doc.url[opts.imageSize || "normal"];
+
         return {
           id: doc._id,
-          url: doc.url[opts.imageSize || "normal"],
+          url: urlField,
           emotion: doc.emotion[0].name,
           source: doc.source
         };
